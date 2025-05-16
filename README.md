@@ -17,3 +17,11 @@ String `guest:guest@localhost:5672` adalah format URL koneksi yang digunakan dal
 - `localhost` : Menunjukkan _hostname_ tempat **RabbitMQ** berjalan. Dalam hal ini, `localhost` berarti **RabbitMQ** berjalan di mesin yang sama dengan tempat klien mencoba untuk terhubung.
 - `:5672` : 5672 adalah _default port server_ **AMQP** dan akan digunakan oleh _server_ **RabbitMQ** untuk menerima koneksi dari _client_.
 
+## Message Broker dengan RabbitMQ
+### Simulation slow subscriber
+![image](https://github.com/user-attachments/assets/59c49bb8-949a-4503-9c66-10b68cff810c)
+
+![image](https://github.com/user-attachments/assets/0d7995eb-1fbf-4217-a127-e950f29db81d)
+
+Pada gambar di atas, terlihat bahwa ketika saya mencoba untuk memberikan _delay_ 2 detik untuk setiap proses pada _subscriber_, terjadi penumpukan pesan di message broker (**RabbitMQ**). Hal ini karena _publisher_ mengirimkan pesan lebih cepat daripada _subscriber_ yang memproses pesan. Setiap kali _publisher_ dijalankan, pesan-pesan yang dikirimkan akan menumpuk di antrian (_queued messages_) di **RabbitMQ**, sementara _subscriber_ hanya dapat memproses pesan secara bertahap dengan _delay_ yang telah ditentukan. Dalam kasus ini, saya menjalankan `cargo run` pada _publisher_ sebanyak 3 kali, yang menyebabkan **RabbitMQ** memiliki 13 pesan dalam antrian. Antrian pesan ini semakin banyak seiring dengan bertambahnya _delay_ pada _subscriber_, karena setiap proses yang diterima oleh _subscriber_ harus menunggu proses sebelumnya selesai terlebih dahulu. Oleh karena itu, meskipun _publisher_ terus mengirimkan pesan, _subscriber_ membutuhkan waktu lebih lama untuk memprosesnya, yang menyebabkan _queued messages_ terus bertambah.
+
